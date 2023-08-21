@@ -13,6 +13,16 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('transaction_id')->nullable();
+            $table->string('order_id', 50)->unique();
+            $table->bigInteger('service_id')->nullable();
+            $table->string('service');
+            $table->string('target_identify');
+            $table->integer('target');
+            $table->integer('original');
+            $table->json('extra_data')->nullable();
+            $table->json('response_data')->nullable();
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }
