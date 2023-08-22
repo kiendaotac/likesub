@@ -16,4 +16,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('test', \App\Livewire\Test::class);
+
+Route::group(['namespace' => 'App\Http\Controllers\Frontend'], function () {
+//    Route::resource('service', 'ServiceController')->only();
+});
+
+Route::get('test/{slug}', \App\Livewire\Test::class)->name('test');
+Route::get('create-order', \App\Livewire\Order\CreateOrder::class);
