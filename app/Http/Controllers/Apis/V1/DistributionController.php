@@ -17,7 +17,7 @@ class DistributionController extends Controller
     public function index(DistributionRequest $request)
     {
         $data = $request->validated();
-        $data['order_id'] = 'f5o2hb8ubj6';
+
         $order = Order::where('order_id', $data['order_id'])->first();
 
         if (!$order) {
@@ -33,6 +33,7 @@ class DistributionController extends Controller
         $targetDone = Distribution::where(['order_id' => $data['order_id'], 'service' => $order->service, 'status' => 'success'])->sum('target');
 
         $target = $order->target;
+        
         $realTarget = $this->getRealTarget($target);
 
         $distribute = Distribution::create([
