@@ -21,9 +21,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $services = Service::query()->whereNull('parent_id')->with('children')->get();
-        View::composer('components.partials.sidebar', function (\Illuminate\View\View $view) use ($services) {
-            $view->with('services', $services);
-        });
+        try {
+            $services = Service::query()->whereNull('parent_id')->with('children')->get();
+            View::composer('components.partials.sidebar', function (\Illuminate\View\View $view) use ($services) {
+                $view->with('services', $services);
+            });
+        } catch (\Exception $exception) {
+            logger($exception->getMessage());
+        }
     }
 }
