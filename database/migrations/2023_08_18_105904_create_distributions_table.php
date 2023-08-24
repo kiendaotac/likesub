@@ -13,11 +13,14 @@ return new class extends Migration
     {
         Schema::create('distributions', function (Blueprint $table) {
             $table->id();
-            $table->string('order_od');
+            $table->string('order_id');
             $table->string('via_id')->nullable();
             $table->string('service');
             $table->string('target_identify');
+            $table->json('extra_data')->nullable();
             $table->integer('target');
+            $table->integer('original');
+            $table->integer('target_done');
             $table->string('status');
             $table->timestamps();
         });

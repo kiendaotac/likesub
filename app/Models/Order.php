@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
@@ -14,6 +15,9 @@ class Order extends Model
     ];
 
     protected $fillable = ['order_id', 'service_id', 'service', 'target_identify', 'target', 'original', 'extra_data', 'response_data', 'status'];
-//    protected $fillable = ['transactions_id', 'service_type', 'social_type', 'social_id', 'original_number', 'target_number'];
 
+    public function distributions(): HasMany
+    {
+        return $this->hasMany(Distribution::class, 'order_id', 'order_id');
+    }
 }

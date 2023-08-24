@@ -10,7 +10,7 @@ class DistributionRequest extends FormRequest
     {
         return [
             'via_id'          => ['required', 'string'],
-            'service'         => ['required', 'string', 'in:FACEBOOK_LIKE_PAGE,FACEBOOK_FLOW_PAGE,FACEBOOK_LIKE_POST'],
+            'order_id'        => ['required', 'string'],
             'target_identify' => ['required', 'string']
         ];
     }
