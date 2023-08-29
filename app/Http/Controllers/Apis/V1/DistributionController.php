@@ -15,45 +15,32 @@ class DistributionController extends Controller
 {
     public function index(DistributionRequest $request)
     {
-        $data = $request->validated();
+        $data    = $request->validated();
+        $viaId   = $data['via_id'];
+        $service = $data['service'];
+        $orders  = Order::where('service', $service)
+            ->where('status', 'pending')
+            ->with('distributions')
+            ->withSum('distributions', 'target')
+            ->orderBy('distributions_sum_target')
+            ->get();
 
-        $order = Order::where('order_id', $data['order_id'])->with('distributions')->first();
-
-        if (!$order) {
+        if (!$orders) {
             return new MessageResource(['errorCode' => Response::HTTP_NOT_FOUND, 'message' => 'order not found']);
         }
 
-        $targetOfOrder = $order->distributions->where('status', '<>', 'error')->sum('target');
+        foreach ($orders as $order) {
+            if ($order->distribustions?->where('via_id', $viaId)->count()) {
+                continue;
+            }
+            if ($order->distributions_sum_target >= $order->target) {
+                continue;
+            }
 
-        if ($targetOfOrder >= $order->target) {
-            return new MessageResource(['errorCode' => 2, 'message' => 'Đơn hàng đã đủ target']);
+            return $this->getDistribution($order, $viaId);
         }
 
-        $checkVia = $order->distributions->where('via_id', $data['via_id'])->count();
-
-        if ($checkVia) {
-            return new MessageResource(['errorCode' => 1, 'message' => 'Via đã chạy cho đơn hàng này']);
-        }
-
-        $targetDone = $order->distributions->where('status', 'success')->sum('target');
-
-        $target = $order->target;
-
-        $realTarget = $this->getRealTarget($target);
-
-        $distribute = Distribution::create([
-            'order_id'        => $order->order_id,
-            'via_id'          => $data['via_id'],
-            'service'         => $order->service,
-            'target_identify' => $order->target_identify,
-            'extra_data'      => json_encode($order->extra_data),
-            'target'          => intval($realTarget / 20),
-            'original'        => $order->original,
-            'target_done'     => $targetDone,
-            'status'          => 'pending',
-        ]);
-
-        return new OrderResource($distribute);
+        return new MessageResource(['errorCode' => Response::HTTP_NOT_FOUND, 'message' => 'all order is complete']);
     }
 
     private function getRealTarget($target)
@@ -71,5 +58,36 @@ class DistributionController extends Controller
             return new MessageResource(['errorCode' => 0, 'message' => 'Cập nhật thành công']);
         }
         return new MessageResource(['errorCode' => 3, 'message' => 'Update lỗi']);
+    }
+
+    private function getDistribution($order, $viaId)
+    {
+        $targetOfOrder = $order->distributions->where('status', '<>', 'error')->sum('target');
+        if ($targetOfOrder >= $order->target) {
+            return new MessageResource(['errorCode' => 2, 'message' => 'Đơn hàng đã đủ target']);
+        }
+        $checkVia = $order->distributions->where('via_id', $viaId)->count();
+        if ($checkVia) {
+            return new MessageResource(['errorCode' => 1, 'message' => 'Via đã chạy cho đơn hàng này']);
+        }
+        $targetDone = $order->distributions->where('status', 'success')->sum('target');
+        $target     = $order->target;
+        $realTarget = $this->getRealTarget($target);
+        $distribute = Distribution::create([
+            'order_id'        => $order->order_id,
+            'via_id'          => $viaId,
+            'service'         => $order->service,
+            'target_identify' => $order->target_identify,
+            'extra_data'      => json_encode($order->extra_data),
+            'target'          => intval($realTarget / 20),
+            'original'        => $order->original,
+            'target_done'     => $targetDone,
+            'status'          => 'pending',
+        ]);
+
+        $group = Distribution::where('service', $order->service)->where('via_id', $viaId)->count() + 1;
+        $distribute->group =  $group;
+
+        return new OrderResource($distribute);
     }
 }

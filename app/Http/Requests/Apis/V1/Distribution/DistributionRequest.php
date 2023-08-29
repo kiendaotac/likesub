@@ -10,8 +10,7 @@ class DistributionRequest extends FormRequest
     {
         return [
             'via_id'          => ['required', 'string'],
-            'order_id'        => ['required', 'string'],
-            'target_identify' => ['required', 'string']
+            'service'        => ['required', 'string'],
         ];
     }
 
