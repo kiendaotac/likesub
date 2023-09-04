@@ -85,7 +85,7 @@ class DistributionController extends Controller
             'status'          => 'pending',
         ]);
 
-        $group = Distribution::where('service', $order->service)->where('target_identify', $order->target_identify)->where('via_id', $viaId)->count() + 1;
+        $group = Distribution::where('service', $order->service)->where('target_identify', $order->target_identify)->where('via_id', $viaId)->count();
         $distribute->group =  $group;
 
         return new OrderResource($distribute);
