@@ -20,7 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['namespace' => 'App\Http\Controllers\Apis\V1', 'prefix' => 'v1'], function () {
     Route::apiResources([
-        'order'        => 'OrderController',
-        'distribution' => 'DistributionController',
+        'order'             => 'OrderController',
+        'distribution'      => 'DistributionController',
+        'list-distribution' => 'DistributionListController'
     ]);
 })->middleware(\App\Http\Middleware\ApiAuth::class);
