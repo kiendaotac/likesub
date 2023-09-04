@@ -14,7 +14,9 @@ class DistributionListController extends Controller
         $perPage = request('perPage') ?? 10;
         $page    = request('page') ?? 1;
 
-        return new DistributionCollection(Distribution::query()->paginate($perPage, ['*'], 'page', $page));
+        $filter = request('filter') ?? [];
+
+        return new DistributionCollection(Distribution::query()->where($filter)->paginate($perPage, ['*'], 'page', $page));
     }
 
     public function store(Request $request)
