@@ -54,6 +54,10 @@ class DistributionController extends Controller
 
     public function update(UpdateDistributionRequest $request, Distribution $distribution)
     {
+        $validated = $request->validated();
+        if ($validated['target_done'] > $distribution->target_done) {
+            $validated['target_done'] = $distribution->target_done;
+        }
         if ($distribution->update($request->validated())) {
             return new MessageResource(['errorCode' => 0, 'message' => 'Cập nhật thành công']);
         }

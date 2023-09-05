@@ -9,7 +9,8 @@ class UpdateDistributionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => ['required', 'string', 'in:success,error']
+            'status'      => ['required', 'string', 'in:success,error'],
+            'target_done' => ['required', 'integer', 'min:0'],
         ];
     }
 
