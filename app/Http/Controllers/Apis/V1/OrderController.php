@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Apis\V1\Order\StoreOrderRequest;
 use App\Http\Requests\Apis\V1\Order\UpdateOrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Http\Resources\OrderResourceCollection;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -15,7 +16,12 @@ class OrderController extends Controller
 {
     public function index()
     {
-        return response()->json('test');
+        $perPage = request('perPage') ?? 10;
+        $page    = request('page') ?? 1;
+
+        $filter = request('filter') ?? [];
+
+        return new OrderResourceCollection(Order::query()->where($filter)->paginate($perPage, ['*'], 'page', $page));
     }
 
     public function store(StoreOrderRequest $request)

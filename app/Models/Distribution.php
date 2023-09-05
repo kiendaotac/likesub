@@ -26,4 +26,14 @@ class Distribution extends Model
     {
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
     }
+
+    protected static function booted()
+    {
+        static::updated(function (Distribution $distribution) {
+            $order = Order::where('order_id', $distribution->order_id)->with('distributions')->first();
+            if ($order->distributions->sum('target_done') >= $order->target) {
+                $order->update(['status' => 'success']);
+            }
+        });
+    }
 }

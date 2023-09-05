@@ -22,6 +22,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Apis\V1', 'prefix' => 'v1'], 
     Route::apiResources([
         'order'             => 'OrderController',
         'distribution'      => 'DistributionController',
-        'list-distribution' => 'DistributionListController'
+        'list-distribution' => 'DistributionListController',
+        'list-order'        => 'OrderController',
     ]);
 })->middleware(\App\Http\Middleware\ApiAuth::class);
