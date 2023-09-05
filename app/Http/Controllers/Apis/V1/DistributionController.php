@@ -46,14 +46,18 @@ class DistributionController extends Controller
     private function getRealTarget($target)
     {
         switch ($target) {
-            case $target > 2000: return $target + 100;
-            case $target > 500: return $target + 60;
-            default: return $target + 20;
+            case $target > 2000: return 100;
+            case $target > 500: return 60;
+            default: return 20;
         }
     }
 
     public function update(UpdateDistributionRequest $request, Distribution $distribution)
     {
+        $validated = $request->validated();
+        if ($validated['target_done'] > $distribution->target_done) {
+            $validated['target_done'] = $distribution->target_done;
+        }
         if ($distribution->update($request->validated())) {
             return new MessageResource(['errorCode' => 0, 'message' => 'Cập nhật thành công']);
         }
@@ -62,31 +66,34 @@ class DistributionController extends Controller
 
     private function getDistribution($order, $viaId)
     {
-        $targetOfOrder = $order->distributions->where('status', '<>', 'error')->sum('target');
-        if ($targetOfOrder >= $order->target) {
+        $targetOfOrder   = $order->distributions->where('status', '<>', 'error')->sum('target');
+        $targetErrorDone = $order->distributions->where('status', 'error')->sum('target_done');
+        if ($targetOfOrder + $targetErrorDone >= $order->target) {
             return new MessageResource(['errorCode' => 2, 'message' => 'Đơn hàng đã đủ target']);
         }
         $checkVia = $order->distributions->where('via_id', $viaId)->count();
         if ($checkVia) {
             return new MessageResource(['errorCode' => 1, 'message' => 'Via đã chạy cho đơn hàng này']);
         }
-        $targetDone = $order->distributions->where('status', 'success')->sum('target');
-        $target     = $order->target;
-        $realTarget = $this->getRealTarget($target);
-        $distribute = Distribution::create([
+        $target      = $order->target;
+        $extraTarget = $this->getRealTarget($target);
+        $targetTodo  = min(($target + $extraTarget) - ($targetOfOrder + $targetErrorDone),
+            intval(($target + $extraTarget) / 20));
+        $distribute  = Distribution::create([
             'order_id'        => $order->order_id,
             'via_id'          => $viaId,
             'service'         => $order->service,
             'target_identify' => $order->target_identify,
             'extra_data'      => json_encode($order->extra_data),
-            'target'          => intval($realTarget / 20),
+            'target'          => $targetTodo,
             'original'        => $order->original,
-            'target_done'     => $targetDone,
+            'target_done'     => 0,
             'status'          => 'pending',
         ]);
 
-        $group = Distribution::where('service', $order->service)->where('target_identify', $order->target_identify)->where('via_id', $viaId)->count();
-        $distribute->group =  $group;
+        $group             = Distribution::where('service', $order->service)->where('target_identify',
+            $order->target_identify)->where('via_id', $viaId)->count();
+        $distribute->group = $group;
 
         return new OrderResource($distribute);
     }
