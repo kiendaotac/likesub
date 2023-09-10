@@ -23,6 +23,8 @@ class Distribution extends Model
         'status',
     ];
 
+    public const MAX_GROUP = 3;
+
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class, 'order_id', 'order_id');
