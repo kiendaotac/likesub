@@ -22,7 +22,7 @@ class DistributionController extends Controller
             ->where('status', 'pending')
             ->with('distributions')
             ->withSum('distributions', 'target')
-            ->orderBy('distributions_sum_target')
+            ->orderBy('group', 'ASC')
             ->get();
 
         if (!$orders) {
@@ -77,9 +77,8 @@ class DistributionController extends Controller
         }
         $target      = $order->target;
         $extraTarget = $this->getRealTarget($target);
-        $targetTodo  = min(($target + $extraTarget) - ($targetOfOrder + $targetErrorDone),
-            intval(($target + $extraTarget) / 20));
-        $distribute  = Distribution::create([
+        $targetTodo  = min(($target + $extraTarget) - ($targetOfOrder + $targetErrorDone), intval(($target + $extraTarget) / 20));
+        $distribute = Distribution::create([
             'order_id'        => $order->order_id,
             'via_id'          => $viaId,
             'service'         => $order->service,
@@ -88,12 +87,11 @@ class DistributionController extends Controller
             'target'          => $targetTodo,
             'original'        => $order->original,
             'target_done'     => 0,
+            'group'           => $order->group,
             'status'          => 'pending',
         ]);
 
-        $group             = Distribution::where('service', $order->service)->where('target_identify',
-            $order->target_identify)->where('via_id', $viaId)->count();
-        $distribute->group = $group;
+        $order->increment('group');
 
         return new OrderResource($distribute);
     }

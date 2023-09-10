@@ -19,6 +19,7 @@ class Distribution extends Model
         'target',
         'original',
         'target_done',
+        'group',
         'status',
     ];
 

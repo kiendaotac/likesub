@@ -14,7 +14,7 @@ class Order extends Model
         'extra_data' => 'json'
     ];
 
-    protected $fillable = ['order_id', 'service_id', 'service', 'target_identify', 'target', 'original', 'extra_data', 'response_data', 'status'];
+    protected $fillable = ['order_id', 'service_id', 'service', 'target_identify', 'target', 'original', 'extra_data', 'response_data', 'group', 'status'];
 
     public function distributions(): HasMany
     {

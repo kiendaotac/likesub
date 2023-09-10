@@ -21,7 +21,11 @@ class OrderController extends Controller
 
         $filter = request('filter') ?? [];
 
-        return new OrderResourceCollection(Order::query()->where($filter)->paginate($perPage, ['*'], 'page', $page));
+        $orders = Order::query()
+            ->withSum('distributions as target_done', 'target_done')
+            ->where($filter)->paginate($perPage, ['*'], 'page', $page);
+
+        return new OrderResourceCollection($orders);
     }
 
     public function store(StoreOrderRequest $request)
