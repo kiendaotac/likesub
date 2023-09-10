@@ -23,7 +23,7 @@ class Distribution extends Model
         'status',
     ];
 
-    public const MAX_GROUP = 3;
+    public const MAX_GROUP = 1;
 
     public function order(): BelongsTo
     {
