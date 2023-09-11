@@ -24,6 +24,7 @@ class Distribution extends Model
     ];
 
     public const MAX_GROUP = 1;
+    public const TARGET_PER_DISTRIBUTION = 20;
 
     public function order(): BelongsTo
     {
