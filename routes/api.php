@@ -23,6 +23,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Apis\V1', 'prefix' => 'v1'], 
     Route::post('distribution/{distribution}', 'DistributionController@update');
     Route::post('list-distribution', 'DistributionListController@index');
     Route::post('list-order', 'OrderController@index');
+    Route::post('order', 'OrderController@store');
 //    Route::apiResources([
 //        'order'             => 'OrderController',
 //        'distribution'      => 'DistributionController',
