@@ -31,8 +31,6 @@ class DistributionController extends Controller
 
         foreach ($orders as $order) {
             if ($order->distributions_sum_target >= $order->target) {
-                // update status order
-                $order->update(['status' => 'success']);
                 continue;
             }
 
