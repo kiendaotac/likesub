@@ -19,10 +19,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::group(['namespace' => 'App\Http\Controllers\Apis\V1', 'prefix' => 'v1'], function () {
-    Route::apiResources([
-        'order'             => 'OrderController',
-        'distribution'      => 'DistributionController',
-        'list-distribution' => 'DistributionListController',
-        'list-order'        => 'OrderController',
-    ]);
+    Route::post('distribution', 'DistributionController@index');
+    Route::post('distribution/{distribution}', 'DistributionController@update');
+    Route::post('list-distribution', 'DistributionListController@index');
+    Route::post('list-order', 'OrderController@index');
+//    Route::apiResources([
+//        'order'             => 'OrderController',
+//        'distribution'      => 'DistributionController',
+//        'list-distribution' => 'DistributionListController',
+//        'list-order'        => 'OrderController',
+//    ]);
 })->middleware(\App\Http\Middleware\ApiAuth::class);
