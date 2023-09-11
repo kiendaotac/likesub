@@ -45,7 +45,8 @@ class DistributionController extends Controller
             }
             $target      = $order->target;
             $extraTarget = $this->getRealTarget($target);
-            $targetTodo  = min(($target + $extraTarget) - ($targetOfOrder + $targetErrorDone), intval(($target + $extraTarget) / 20));
+
+            $targetTodo  = min(($target + $extraTarget) - ($targetOfOrder + $targetErrorDone), Distribution::TARGET_PER_DISTRIBUTION);
             $distribute = Distribution::create([
                 'order_id'        => $order->order_id,
                 'via_id'          => $viaId,
