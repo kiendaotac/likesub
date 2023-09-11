@@ -21,7 +21,6 @@ class DistributionController extends Controller
         $orders  = Order::where('service', $service)
             ->where('status', 'pending')
             ->with('distributions')
-            ->withSum('distributions', 'target')
             ->orderBy('priority', 'ASC')
             ->get();
 
@@ -30,17 +29,18 @@ class DistributionController extends Controller
         }
 
         foreach ($orders as $order) {
+            $target      = $order->target;
+            $extraTarget = $this->getRealTarget($target);
+
             $targetOfOrder   = $order->distributions->where('status', '<>', 'error')->sum('target');
             $targetErrorDone = $order->distributions->where('status', 'error')->sum('target_done');
-            if ($targetOfOrder + $targetErrorDone >= $order->target) {
+            if ($targetOfOrder + $targetErrorDone >= ($target + $extraTarget)) {
                 return new MessageResource(['errorCode' => 2, 'message' => 'Đơn hàng đã đủ target']);
             }
             $group = Distribution::where(['via_id' => $viaId, 'target_identify' => $order->target_identify])->count();
             if (++$group > Distribution::MAX_GROUP) {
                 return new MessageResource(['errorCode' => 1, 'message' => "Via đã chạy hết cho target_identify:{$order->target_identify} này"]);
             }
-            $target      = $order->target;
-            $extraTarget = $this->getRealTarget($target);
 
             $targetTodo  = min(($target + $extraTarget) - ($targetOfOrder + $targetErrorDone), Distribution::TARGET_PER_DISTRIBUTION);
             $distribute = Distribution::create([
