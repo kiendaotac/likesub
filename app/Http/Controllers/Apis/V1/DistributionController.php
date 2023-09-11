@@ -30,10 +30,6 @@ class DistributionController extends Controller
         }
 
         foreach ($orders as $order) {
-            if ($order->distributions_sum_target >= $order->target) {
-                continue;
-            }
-
             $targetOfOrder   = $order->distributions->where('status', '<>', 'error')->sum('target');
             $targetErrorDone = $order->distributions->where('status', 'error')->sum('target_done');
             if ($targetOfOrder + $targetErrorDone >= $order->target) {
