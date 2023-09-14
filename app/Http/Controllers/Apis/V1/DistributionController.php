@@ -35,7 +35,8 @@ class DistributionController extends Controller
             $targetOfOrder   = $order->distributions->where('status', '<>', 'error')->sum('target');
             $targetErrorDone = $order->distributions->where('status', 'error')->sum('target_done');
             if ($targetOfOrder + $targetErrorDone >= ($target + $extraTarget)) {
-                return new MessageResource(['errorCode' => 2, 'message' => 'Đơn hàng đã đủ target']);
+                continue;
+//                return new MessageResource(['errorCode' => 2, 'message' => 'Đơn hàng đã đủ target']);
             }
             $group = Distribution::where(['via_id' => $viaId, 'target_identify' => $order->target_identify])->count();
             if (++$group > Distribution::MAX_GROUP) {
