@@ -24,6 +24,7 @@ Route::group(['namespace' => 'App\Http\Controllers\Apis\V1', 'prefix' => 'v1'], 
     Route::post('list-distribution', 'DistributionListController@index');
     Route::post('list-order', 'OrderController@index');
     Route::post('order', 'OrderController@store');
+    Route::post('order/cancel', 'OrderController@cancelOrder');
 //    Route::apiResources([
 //        'order'             => 'OrderController',
 //        'distribution'      => 'DistributionController',
